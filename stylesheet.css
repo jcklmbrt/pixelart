@@ -6,6 +6,8 @@ nav {
 
 canvas {
 	border: 1px solid black;
+	margin: 0;
+	padding: 0;
 }
 
 div.container img {
@@ -20,6 +22,10 @@ div.container img {
 div.container {
 	border: 1px solid black;
 	display: inline-block;
+	height: fit-content;
+	padding: 0;
+	margin: 30px;
+	border-spacing: 0;
 }
 
 div.container div.tools {

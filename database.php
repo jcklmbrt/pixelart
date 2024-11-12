@@ -9,8 +9,12 @@ class database_connection extends PDO
 
 	public function migrate() : void
 	{
-		$this->exec('DROP TABLE `users`');
-		$this->exec('DROP TABLE `pictures`');
+		try {
+			$this->exec('DROP TABLE `users`');
+			$this->exec('DROP TABLE `pictures`');
+		} catch(Exception $e) {
+			error_log($e->getMessage());
+		}
 
 		$this->exec('CREATE TABLE `users` (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,

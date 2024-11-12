@@ -1,19 +1,142 @@
 
 "use strict";
 
+var palette;
 var pixels;
 var canvas;
 var ctx;
 
 var mouse_down = false;
 
+const BLACK = 0x00;
+const WHITE = 0x3F;
+const PIXEL_SIZE = 10;
+
+var palette = {
+	show: function(e) {
+		var elem = document.getElementsByClassName("palette")[0];
+
+		if(elem.style.display == "block") {
+			elem.style.display="none";
+		} else {
+			elem.style.display = "block";
+		}	
+
+		elem.style.left = e.clientX.toString(10) + "px";
+		elem.style.top  = e.clientY.toString(10) + "px";
+	},
+	hide: function() {
+		var elem = document.getElementsByClassName("palette")[0];
+		elem.style.display="none";
+	}
+};
+
+
+class pixel_canvas 
+{
+	static PIXEL_SIZE = 10;
+	static mouse_down = false;
+
+	#ctx;
+	#canvas;
+	#pixels;
+	#palette;
+
+	width;
+	height;
+	tool;
+
+	constructor()
+	{
+		this.#canvas = document.getElementById("canvas");
+		this.#ctx    = this.canvas.getContext("2d");
+
+		this.#palette = new palette;
+
+		this.width  = canvas.width  / PIXEL_SIZE;
+		this.height = canvas.height / PIXEL_SIZE;
+
+		this.clear_pixels();
+	}
+
+	clear_pixels()
+	{
+		this.#pixels = new Uint8Array(w * h);
+
+		for(var y = 0; y < this.height; y++)
+		for(var x = 0; x < this.width;  x++) {
+			this.#pixels[y * this.width + x] = WHITE;
+		}
+
+		this.#ctx.clearRect(0, 0, canvas.width, canvas.height);
+	}
+
+	draw()
+	{
+		for(var y = 0; y < h; y++)
+		for(var x = 0; x < w; x++) {
+			var color = pixels[y * w + x];
+
+			ctx.fillStyle = bytecolor_to_string(color);
+			ctx.fillRect(x * PIXEL_SIZE, 
+			             y * PIXEL_SIZE, 
+			             PIXEL_SIZE, 
+			             PIXEL_SIZE);
+		}
+	}
+
+	to_base64()
+	{
+		var s = "";
+		for(var i = 0; i < this.#pixels.length; i++) {
+			var pixel = this.#pixels[i] & 0b111111;
+			s += String.fromCharCode(pixel + 48);
+		}
+		return s;
+	}
+};
+
+class base_tool
+{
+	static color = BLACK;
+
+	interact(pixels, x, y) 
+	{
+	}
+
+	constructor() 
+	{
+		//this.color = CPixelCanvas.WHITE;
+	}
+};
+
+class pencil_tool extends base_tool 
+{
+	interact(pixels, x, y) /* override */
+	{
+		super.interact(pixels, x, y);
+	}
+};
+
+class bucket_tool extends base_tool 
+{
+	interact(pixels, x, y) /* override */
+	{
+		super.interact(pixels, x, y);
+	}
+};
+
+
+class color_picker extends base_tool
+{
+	
+};
+
+
 const PENCIL       = 0;
 const BUCKET       = 1;
 const COLOR_PICKER = 2
 
-const BLACK = 0x00;
-const WHITE = 0xFF;
-const PIXEL_SIZE = 10;
 
 var pen_color = BLACK;
 var cur_tool  = PENCIL;
@@ -22,20 +145,30 @@ function set_bucket() { canvas.style.cursor= "url(bucket.png),auto"; cur_tool = 
 function set_pencil() { canvas.style.cursor= "url(pencil.png),auto"; cur_tool = PENCIL; }
 function set_color_picker() { canvas.style.cursor= "url(color-picker.png),auto"; cur_tool = COLOR_PICKER; }
 
+function pixels_to_base64()
+{
+	var s = "";
+	for(var i = 0; i < pixels.length; i++) {
+		var pixel = pixels[i] & 0b111111;
+		s += String.fromCharCode(pixel + 48);
+	}
+	return s;
+}
+
 function set_pen_color(color)
 {
-	var palette = document.getElementsByClassName("palette")[0];
-	palette.style.display = "none";
-
+	palette.hide();
+	
 	var col = document.getElementById("color");
 	col.style.background = bytecolor_to_string(color);
+
 	pen_color = color;
 }
 
-/* you could use a lookup table instead. it's only 256 values */
+/* you could use a lookup table instead. it's only 64 values */
 function bytecolor_to_string(color)
 {
-	/* color encoding: 0bRRRGGGBB */
+	/* color encoding: 0bRRGGBB */
 	var blue  = (color >> 0) & 3;
 	var green = (color >> 2) & 3;
 	var red   = (color >> 4) & 3;
@@ -100,9 +233,12 @@ function flood_fill(x, y)
 	}
 }
 
+
 function canvas_mousemove(e) 
 {
 	if(mouse_down) {
+		palette.hide();
+
 		var pos_x = Math.floor(e.offsetX / PIXEL_SIZE);
 		var pos_y = Math.floor(e.offsetY / PIXEL_SIZE);
 
@@ -131,23 +267,9 @@ function canvas_mousemove(e)
 	}
 }
 
-function show_palette(e)
-{
-	var palette = document.getElementsByClassName("palette")[0];
-
-	if(palette.style.display == "block") {
-		palette.style.display = "none";
-	} else {
-		palette.style.display = "block";
-	}
-
-	palette.style.left = e.clientX.toString(10) + "px";
-	palette.style.top  = e.clientY.toString(10) + "px";
-}
 
 function canvas_mousedown(e)
 {
-	console.log(e);
 	mouse_down = true;
 	canvas_mousemove(e);
 }
@@ -162,7 +284,6 @@ function main()
 {
 	canvas = document.getElementById("canvas");
 	ctx    = canvas.getContext("2d");
-
 	/* init pixels */
 	canvas_reset();
 
@@ -171,7 +292,7 @@ function main()
 	set_pen_color(BLACK);
 
 	var colorbox = document.getElementById("color");
-	colorbox.addEventListener("mousedown", show_palette);
+	colorbox.addEventListener("mousedown", palette.show);
 	
 	canvas.addEventListener("mousemove", canvas_mousemove);
 	canvas.addEventListener("mousedown", canvas_mousedown);

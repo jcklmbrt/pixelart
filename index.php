@@ -24,9 +24,7 @@ function bytecolor_to_string(int $color)
 
 ?>
 
-
 <!DOCTYPE HTML>
-
 <html>
 	<head>
 		<link rel="stylesheet" href="stylesheet.css"></link>
@@ -52,9 +50,7 @@ function bytecolor_to_string(int $color)
 		</form>
 		</nav>
 		<div class="container">
-
 			<canvas id="canvas" width="350px" height="300px"></canvas>
-
 			<div class="tools">
 				<img src="pencil.png" onclick="set_pencil()"></img>
 				<img src="bucket.png" onclick="set_bucket()"></img>
@@ -62,7 +58,6 @@ function bytecolor_to_string(int $color)
 				<img src="reset.png" onclick="canvas_reset()"></img>
 				<button id="color"></button>
 			</div>
-
 			<table class="palette" style="display: none;">
 				<tr>
 				<?php for($i = 0; $i < 64; $i += 1) { ?>
@@ -71,7 +66,6 @@ function bytecolor_to_string(int $color)
 				<?php } ?>
 				</tr>
 			</table>
-
 		</div>
-	</body>
+		</body>
 </html>
