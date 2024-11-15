@@ -1,71 +1,171 @@
 
 "use strict";
 
-var palette;
-var pixels;
-var canvas;
-var ctx;
-
-var mouse_down = false;
+var /* Palette */     palette;
+var /* PixelCanvas */ pixcanv;
 
 const BLACK = 0x00;
 const WHITE = 0x3F;
 const PIXEL_SIZE = 10;
 
-var palette = {
-	show: function(e) {
-		var elem = document.getElementsByClassName("palette")[0];
+class Palette
+{
+	#elem;
 
-		if(elem.style.display == "block") {
-			elem.style.display="none";
+	constructor()
+	{
+		this.#elem = document.getElementsByClassName("palette")[0];
+
+		var colorbox = document.getElementById("color");
+		colorbox.addEventListener("mousedown", function(e) { 
+			palette.show(e.clientX, e.clientY);
+		});
+	}
+
+	show(x, y)
+	{
+		if(this.#elem.style.display == "block") {
+			this.#elem.style.display = "none";
 		} else {
-			elem.style.display = "block";
-		}	
+			this.#elem.style.display = "block";
+		}
 
-		elem.style.left = e.clientX.toString(10) + "px";
-		elem.style.top  = e.clientY.toString(10) + "px";
-	},
-	hide: function() {
-		var elem = document.getElementsByClassName("palette")[0];
-		elem.style.display="none";
+		this.#elem.style.left = x.toString(10) + "px";
+		this.#elem.style.top  = y.toString(10) + "px";
+	}
+
+	hide()
+	{
+		this.#elem.style.display = "none";
 	}
 };
 
 
-class pixel_canvas 
+class PixelCanvas 
 {
-	static PIXEL_SIZE = 10;
 	static mouse_down = false;
 
 	#ctx;
 	#canvas;
 	#pixels;
-	#palette;
+	#history;
+	#future;
 
 	width;
 	height;
 	tool;
 
+	onchange()
+	{
+		/* future will be invalid after change */
+		this.#future = [];
+		var clone = new Uint8Array(this.#pixels);
+		this.#history.push(clone);
+	}
+
+	check_history()
+	{
+		if(this.#history.length == 0) {
+			return;
+		}
+
+		var top = this.#history.pop();
+
+		for(var i = 0; i < this.#pixels.length; i++) {
+			if(this.#pixels[i] != top[i]) {
+				this.#history.push(top);
+				return;
+			}
+		}
+
+		/* nothing changed, discard our last edit. */
+	}
+
+	undo()
+	{
+		if(this.#history.length != 0) {
+			/* transfer ownership of #pixels to #future */
+			this.#future.push(this.#pixels);
+			var old_pixels = this.#history.pop();
+			this.#pixels = new Uint8Array(old_pixels);
+		}
+
+		this.draw();
+	}
+
+	redo()
+	{
+		if(this.#future.length != 0) {
+			/* transfer ownership of #pixels to #history */
+			this.#history.push(this.#pixels);
+			var pixels = this.#future.pop();
+			this.#pixels = new Uint8Array(pixels);
+		}
+
+		this.draw();
+	}
+
 	constructor()
 	{
 		this.#canvas = document.getElementById("canvas");
-		this.#ctx    = this.canvas.getContext("2d");
-
-		this.#palette = new palette;
+		this.#ctx    = this.#canvas.getContext("2d");
 
 		this.width  = canvas.width  / PIXEL_SIZE;
 		this.height = canvas.height / PIXEL_SIZE;
 
 		this.clear_pixels();
+
+		this.#history = [];
+		this.#future  = [];
+
+		this.#canvas.addEventListener("mousemove", function(e) {
+			pixcanv.mousemove(e.offsetX, e.offsetY);
+		});
+	
+		this.#canvas.addEventListener("mousedown", function(e) {
+			if(e.button == 0 /* Left Button */) {
+				pixcanv.mouse_down = true;
+				pixcanv.onchange();
+				pixcanv.mousemove(e.offsetX, e.offsetY);
+			}
+		});
+
+		var unsel = function() {
+			pixcanv.mouse_down = false;
+			pixcanv.check_history();
+		}
+	
+		this.#canvas.addEventListener("mouseup",  unsel);
+		this.#canvas.addEventListener("mouseout", unsel);
 	}
+
+	mousemove(x, y)
+	{
+		if(this.mouse_down) {
+	
+			var pos_x = Math.floor(x / PIXEL_SIZE);
+			var pos_y = Math.floor(y / PIXEL_SIZE);
+	
+			this.tool.interact(this, pos_x, pos_y);	
+			this.draw();
+		}
+	}
+
+	set_cursor(url)
+	{
+		this.#canvas.style.cursor= "url(" + url + "), auto";
+	}
+
+	set_pixel(x, y, color) { this.#pixels[y * this.width + x] = color; }
+	get_pixel(x, y) { return this.#pixels[y * this.width + x]; }
 
 	clear_pixels()
 	{
-		this.#pixels = new Uint8Array(w * h);
+		this.#pixels = new Uint8Array(this.width * this.height);
 
 		for(var y = 0; y < this.height; y++)
 		for(var x = 0; x < this.width;  x++) {
-			this.#pixels[y * this.width + x] = WHITE;
+			this.set_pixel(x, y, WHITE);
 		}
 
 		this.#ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -73,12 +173,14 @@ class pixel_canvas
 
 	draw()
 	{
-		for(var y = 0; y < h; y++)
-		for(var x = 0; x < w; x++) {
-			var color = pixels[y * w + x];
+		this.#ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-			ctx.fillStyle = bytecolor_to_string(color);
-			ctx.fillRect(x * PIXEL_SIZE, 
+		for(var y = 0; y < this.height; y++)
+		for(var x = 0; x < this.width;  x++) {
+			var color = this.get_pixel(x, y);
+
+			this.#ctx.fillStyle = color_to_string(color);
+			this.#ctx.fillRect(x * PIXEL_SIZE, 
 			             y * PIXEL_SIZE, 
 			             PIXEL_SIZE, 
 			             PIXEL_SIZE);
@@ -88,6 +190,7 @@ class pixel_canvas
 	to_base64()
 	{
 		var s = "";
+		/* converts to base64 really neatly as each color is already 6 bits. */
 		for(var i = 0; i < this.#pixels.length; i++) {
 			var pixel = this.#pixels[i] & 0b111111;
 			s += String.fromCharCode(pixel + 48);
@@ -96,77 +199,124 @@ class pixel_canvas
 	}
 };
 
-class base_tool
+class BaseTool
 {
-	static color = BLACK;
-
-	interact(pixels, x, y) 
-	{
-	}
+	static _color;
 
 	constructor() 
 	{
-		//this.color = CPixelCanvas.WHITE;
+		if(pixcanv.tool) {
+			this.set_color(pixcanv.tool._color);
+		} else {
+			this.set_color(BLACK);
+		}
 	}
-};
 
-class pencil_tool extends base_tool 
-{
-	interact(pixels, x, y) /* override */
+	interact(pixcanv, x, y) 
 	{
-		super.interact(pixels, x, y);
+		palette.hide();
 	}
-};
 
-class bucket_tool extends base_tool 
-{
-	interact(pixels, x, y) /* override */
+	set_color(color)
 	{
-		super.interact(pixels, x, y);
+		palette.hide();
+	
+		var col = document.getElementById("color");
+		col.style.background = color_to_string(color);
+
+		this._color = color;
+	}
+};
+
+class PencilTool extends BaseTool 
+{
+	constructor()
+	{
+		pixcanv.set_cursor("pencil.png");
+		super();
+	}
+
+	interact(pixcanv, x, y) /* override */
+	{
+		pixcanv.set_pixel(x, y, this._color);
+		super.interact(pixcanv, x, y);
+	}
+};
+
+class BucketTool extends BaseTool 
+{
+	constructor()
+	{
+		pixcanv.set_cursor("bucket.png");
+		super();
+	}
+
+	interact(pixcanv, x, y) /* override */
+	{
+		var old_color = pixcanv.get_pixel(x, y);
+		var todo      = [x, y];
+
+		if(this._color == old_color) {
+			return;
+		}
+
+		while(todo.length != 0) {
+
+			y = todo.pop();
+			x = todo.pop();
+
+			pixcanv.set_pixel(x, y, this._color);
+
+			if(x + 1 <= pixcanv.width && pixcanv.get_pixel(x + 1, y) == old_color) {
+				todo.push(x + 1);
+				todo.push(y);
+			}
+			if(x - 1 >= 0 && pixcanv.get_pixel(x - 1, y) == old_color) {
+				todo.push(x - 1);
+				todo.push(y);
+			}
+			if(y + 1 <= pixcanv.height && pixcanv.get_pixel(x, y + 1) == old_color) {
+				todo.push(x);
+				todo.push(y + 1);
+			}
+			if(y - 1 >= 0 && pixcanv.get_pixel(x, y - 1) == old_color) {
+				todo.push(x);
+				todo.push(y - 1);
+			}
+		}
+
+		super.interact(pixcanv, x, y);
 	}
 };
 
 
-class color_picker extends base_tool
+class ColorPicker extends BaseTool
 {
-	
+	constructor()
+	{
+		pixcanv.set_cursor("color-picker.png");
+		super();
+	}
+
+	interact(pixcanv, x, y) /* override */
+	{
+		var color = pixcanv.get_pixel(x, y);
+		set_tool_color(color);
+		super.interact(pixcanv, x, y);
+	}
 };
 
-
-const PENCIL       = 0;
-const BUCKET       = 1;
-const COLOR_PICKER = 2
-
-
-var pen_color = BLACK;
-var cur_tool  = PENCIL;
-
-function set_bucket() { canvas.style.cursor= "url(bucket.png),auto"; cur_tool = BUCKET; }
-function set_pencil() { canvas.style.cursor= "url(pencil.png),auto"; cur_tool = PENCIL; }
-function set_color_picker() { canvas.style.cursor= "url(color-picker.png),auto"; cur_tool = COLOR_PICKER; }
-
-function pixels_to_base64()
-{
-	var s = "";
-	for(var i = 0; i < pixels.length; i++) {
-		var pixel = pixels[i] & 0b111111;
-		s += String.fromCharCode(pixel + 48);
-	}
-	return s;
-}
-
-function set_pen_color(color)
-{
-	palette.hide();
-	
-	var col = document.getElementById("color");
-	col.style.background = bytecolor_to_string(color);
-
-	pen_color = color;
-}
+/* this is the "API" we expose to the html */
+function set_bucket()          { pixcanv.tool = new BucketTool; }
+function set_pencil()          { pixcanv.tool = new PencilTool; }
+function set_color_picker()    { pixcanv.tool = new ColorPicker; }
+function set_tool_color(color) { pixcanv.tool.set_color(color); }
+function canvas_reset()        { pixcanv.clear_pixels(); pixcanv.draw(); pixcanv.onchange(); /* in case we want to undo the reset */ }
+function canvas_undo()         { pixcanv.undo() }
+function canvas_redo()         { pixcanv.redo() }
 
 /* you could use a lookup table instead. it's only 64 values */
-function bytecolor_to_string(color)
+function color_to_string(color)
 {
 	/* color encoding: 0bRRGGBB */
 	var blue  = (color >> 0) & 3;
@@ -180,122 +330,26 @@ function bytecolor_to_string(color)
 	return "rgb(" + red + "," + green + "," + blue + ")";
 }
 
-function canvas_reset()
-{
-	var w = canvas.width  / PIXEL_SIZE;
-	var h = canvas.height / PIXEL_SIZE;
-
-	pixels = new Uint8Array(w * h);
-
-	for(var y = 0; y < h; y++)
-	for(var x = 0; x < w; x++) {
-		pixels[y * w + x] = WHITE;
-	}
-
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-function flood_fill(x, y)
-{
-	var w = canvas.width  / PIXEL_SIZE;
-	var h = canvas.height / PIXEL_SIZE;
-
-	var old_color = pixels[y * w + x];
-	var todo      = [x, y];
-
-	if(pen_color == old_color) {
-		return;
-	}
-
-	while(todo.length != 0) {
-
-		y = todo.pop();
-		x = todo.pop();
-
-		pixels[y * w + x] = pen_color;
-
-		if(x + 1 <= w && pixels[y * w + x + 1] == old_color) {
-			todo.push(x + 1);
-			todo.push(y);
-		}
-		if(x - 1 >= 0 && pixels[y * w + x - 1] == old_color) {
-			todo.push(x - 1);
-			todo.push(y);
-		}
-		if(y + 1 <= h && pixels[(y + 1) * w + x] == old_color) {
-			todo.push(x);
-			todo.push(y + 1);
-		}
-		if(y - 1 >= 0 && pixels[(y - 1) * w + x] == old_color) {
-			todo.push(x);
-			todo.push(y - 1);
-		}
-	}
-}
-
-
-function canvas_mousemove(e) 
-{
-	if(mouse_down) {
-		palette.hide();
-
-		var pos_x = Math.floor(e.offsetX / PIXEL_SIZE);
-		var pos_y = Math.floor(e.offsetY / PIXEL_SIZE);
-
-		var w = canvas.width  / PIXEL_SIZE;
-		var h = canvas.height / PIXEL_SIZE;
-
-		switch(cur_tool) {
-		case BUCKET:
-			flood_fill(pos_x, pos_y);
-			break;
-		case PENCIL:
-			pixels[pos_y * w + pos_x] = pen_color;
-			break;
-		case COLOR_PICKER:
-			set_pen_color(pixels[pos_y * w + pos_x]);
-			break;
-		}
-
-		for(var y = 0; y < h; y++)
-		for(var x = 0; x < w; x++) {
-			var color = pixels[y * w + x];
-
-			ctx.fillStyle = bytecolor_to_string(color);
-			ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
-		}
-	}
-}
-
-
-function canvas_mousedown(e)
-{
-	mouse_down = true;
-	canvas_mousemove(e);
-}
-
-function canvas_unsel(e)
-{
-	mouse_down = false;
-}
-
-
 function main() 
 {
-	canvas = document.getElementById("canvas");
-	ctx    = canvas.getContext("2d");
-	/* init pixels */
-	canvas_reset();
+	palette = new Palette;
+	pixcanv = new PixelCanvas;
 
-	/* start with black pencil */
 	set_pencil();
-	set_pen_color(BLACK);
+	set_tool_color(BLACK);
 
-	var colorbox = document.getElementById("color");
-	colorbox.addEventListener("mousedown", palette.show);
-	
-	canvas.addEventListener("mousemove", canvas_mousemove);
-	canvas.addEventListener("mousedown", canvas_mousedown);
-	canvas.addEventListener("mouseup",   canvas_unsel);
-	canvas.addEventListener("mouseout",  canvas_unsel);
+	/* keybinds */
+	window.addEventListener("keydown", function(e) 
+	{
+		if(e.ctrlKey == true) {
+			switch(e.code) {
+				case "KeyZ": /* Ctrl-Z */
+					canvas_undo();
+					break;
+				case "KeyY": /* Ctrl-Y */
+					canvas_redo();
+					break;
+			}
+		}
+	});
 }

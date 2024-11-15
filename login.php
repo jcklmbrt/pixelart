@@ -33,7 +33,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$username = htmlentities($_POST['username']);
 		$password = htmlentities($_POST['password']);
 
-		$db = new database_connection;
+		$db = new DatabaseConnection;
 
 		if($db->login($username, $password)) {
 			$_SESSION['username'] = $username;

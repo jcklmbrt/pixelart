@@ -4,11 +4,10 @@ session_start();
 
 require "database.php";
 
-$db = new database_connection;
-
+$db = new DatabaseConnection;
 $db->migrate();
 
-function bytecolor_to_string(int $color)
+function color_to_string(int $color)
 {
 	/* color encoding: 0bAARRGGBB */
 	$blue  = ($color >> 0) & 3;
@@ -55,6 +54,8 @@ function bytecolor_to_string(int $color)
 				<img src="pencil.png" onclick="set_pencil()"></img>
 				<img src="bucket.png" onclick="set_bucket()"></img>
 				<img src="color-picker.png"  onclick="set_color_picker()"></img>
+				<img src="undo.png" onclick="canvas_undo()"></img>
+				<img src="redo.png" onclick="canvas_redo()"></img>
 				<img src="reset.png" onclick="canvas_reset()"></img>
 				<button id="color"></button>
 			</div>
@@ -62,7 +63,7 @@ function bytecolor_to_string(int $color)
 				<tr>
 				<?php for($i = 0; $i < 64; $i += 1) { ?>
 					<?php if($i % 8 == 0) { echo "</tr><tr>"; } ?>
-					<?php echo "<td style='background-color:" . bytecolor_to_string($i) . "' onclick='set_pen_color(" . $i . ")'></td>"; ?>
+					<?php echo "<td style='background-color:" . color_to_string($i) . "' onclick='set_tool_color(" . $i . ")'></td>"; ?>
 				<?php } ?>
 				</tr>
 			</table>
