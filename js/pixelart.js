@@ -232,7 +232,7 @@ class PencilTool extends BaseTool
 {
 	constructor()
 	{
-		pixcanv.set_cursor("pencil.png");
+		pixcanv.set_cursor("img/pencil.png");
 		super();
 	}
 
@@ -247,7 +247,7 @@ class BucketTool extends BaseTool
 {
 	constructor()
 	{
-		pixcanv.set_cursor("bucket.png");
+		pixcanv.set_cursor("img/bucket.png");
 		super();
 	}
 
@@ -294,7 +294,7 @@ class ColorPicker extends BaseTool
 {
 	constructor()
 	{
-		pixcanv.set_cursor("color-picker.png");
+		pixcanv.set_cursor("img/color-picker.png");
 		super();
 	}
 

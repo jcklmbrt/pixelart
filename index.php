@@ -1,10 +1,10 @@
 <?php
 
+require "db/database.php";
+
 session_start();
 
-require "database.php";
-
-$db = new DatabaseConnection;
+$db = DatabaseConnection::get();
 $db->migrate();
 
 function color_to_string(int $color)
@@ -27,12 +27,12 @@ function color_to_string(int $color)
 <html>
 	<head>
 		<link rel="stylesheet" href="stylesheet.css"></link>
-		<script type="text/javascript" src="pixelart.js"></script>
+		<script type="text/javascript" src="js/pixelart.js"></script>
 	</head>
 	<body onload="main()">
 		<nav>
-		<?php if(isset($_SESSION['username'])) { ?>
-			<?php print_r($_SESSION['username']); ?>
+		<?php if(isset($_SESSION['user'])) { ?>
+			<?php $user = $_SESSION['user']; echo $user->username ?>
 			<a href="login.php">logout</a>
 		<?php } else { ?>
 			<form method="POST" action="/login.php">
@@ -51,12 +51,12 @@ function color_to_string(int $color)
 		<div class="container">
 			<canvas id="canvas" width="350px" height="300px"></canvas>
 			<div class="tools">
-				<img src="pencil.png" onclick="set_pencil()"></img>
-				<img src="bucket.png" onclick="set_bucket()"></img>
-				<img src="color-picker.png"  onclick="set_color_picker()"></img>
-				<img src="undo.png" onclick="canvas_undo()"></img>
-				<img src="redo.png" onclick="canvas_redo()"></img>
-				<img src="reset.png" onclick="canvas_reset()"></img>
+				<img src="img/pencil.png"       onclick="set_pencil()"></img>
+				<img src="img/bucket.png"       onclick="set_bucket()"></img>
+				<img src="img/color-picker.png" onclick="set_color_picker()"></img>
+				<img src="img/undo.png"         onclick="canvas_undo()"></img>
+				<img src="img/redo.png"         onclick="canvas_redo()"></img>
+				<img src="img/reset.png"        onclick="canvas_reset()"></img>
 				<button id="color"></button>
 			</div>
 			<table class="palette" style="display: none;">

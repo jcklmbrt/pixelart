@@ -2,10 +2,16 @@
 
 session_start();
 
-include_once "database.php";
+include_once "db/database.php";
 
 define('USERNAME_MAX_LEN', 12);
 define('USERNAME_MIN_LEN', 3);
+
+
+function is_logged_in() : bool
+{
+	return isset($_SESSION['user']);
+}
 
 function is_valid_username(string $username) : bool
 {
@@ -33,10 +39,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$username = htmlentities($_POST['username']);
 		$password = htmlentities($_POST['password']);
 
-		$db = new DatabaseConnection;
+		$user = User::fetch($username);
 
-		if($db->login($username, $password)) {
-			$_SESSION['username'] = $username;
+		if($user->password_verify($password)) {
+			$_SESSION['user'] = $user;
 		} else {
 			$GLOBALS['err'] = "test";
 		}

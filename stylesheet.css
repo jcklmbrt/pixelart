@@ -1,13 +1,26 @@
 
+html {
+	background-color: #EDFED8;
+}
+
 nav {
 	padding: 2em;
 	float: right;
+	background-color: #FFD1DC;
+	border-radius: 6px;
+	border: 1px solid black;
+}
+
+input {
+	display: block;
+	margin: 1em;
 }
 
 canvas {
 	border: 1px solid black;
 	margin: 0;
 	padding: 0;
+	background-color: white;
 }
 
 div.container img {
@@ -23,9 +36,12 @@ div.container {
 	border: 1px solid black;
 	display: inline-block;
 	height: fit-content;
-	padding: 0;
+	padding: 1em;
+	padding-left: 0;
 	margin: 30px;
 	border-spacing: 0;
+	background-color: #FFD1DC;
+	border-radius: 6px;
 }
 
 div.container div.tools {
