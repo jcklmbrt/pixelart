@@ -173,6 +173,9 @@ class PixelCanvas
 
 	draw()
 	{
+		var form_data = document.getElementById("form_data");
+		form_data.value = this.to_base64();
+
 		this.#ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		for(var y = 0; y < this.height; y++)

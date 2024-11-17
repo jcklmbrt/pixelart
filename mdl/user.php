@@ -1,8 +1,7 @@
 <?php
-namespace DB;
-require_once 'db/connection.php';
+namespace mdl;
 
-class User
+class user
 {
 	public  int    $id;
 	public  string $username;
@@ -16,23 +15,23 @@ class User
 		$this->password = $password;
 	}
 
-	public static function insert($username, $password) : ?User
+	public static function insert($username, $password) : ?user
 	{
-		$db = Connection::get();
+		$db = connection::get();
 		$password_hash = password_hash($password, PASSWORD_BCRYPT);
 
 		$stmt = $db->prepare('INSERT INTO `users` (username, password) VALUES (?,?);');
 
 		if($stmt->execute([$username, $password_hash])) {
-			return new User($db->lastInsertId(), $username, $password);
+			return new user($db->lastInsertId(), $username, $password);
 		} else {
 			return null;
 		}
 	}
 
-	public static function fetch($username) : ?User
+	public static function fetch($username) : ?user
 	{
-		$db = Connection::get();
+		$db = connection::get();
 		$stmt = $db->prepare('SELECT id, password FROM `users` WHERE username=?');
 		$stmt->execute([$username]);
 		$userdata = $stmt->fetch();
@@ -43,7 +42,7 @@ class User
 		if($userdata == FALSE) {
 			return null;
 		} else {
-			return new User($userid, $username, $password);
+			return new user($userid, $username, $password);
 		}
 	}
 

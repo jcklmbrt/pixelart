@@ -1,12 +1,15 @@
 <?php
 
-require_once "db/user.php";
-use DB\Connection;
-use DB\User;
+set_include_path($_SERVER['DOCUMENT_ROOT']);
+spl_autoload_extensions('.php');
+spl_autoload_register();
+
+use mdl\connection;
+use mdl\user;
 
 session_start();
 
-$db = Connection::get();
+$db = connection::get();
 $db->migrate();
 
 function is_logged_in() : bool
@@ -40,9 +43,10 @@ function color_to_string(int $color)
 		<nav>
 		<?php if(is_logged_in()) { ?>
 			<?php $user = $_SESSION['user']; echo $user->username ?>
-			<a href="login.php">logout</a>
+			<a href="profile.php">my profile</a>
+			<a href="ctrl/login.php">logout</a>
 		<?php } else { ?>
-			<form method="POST" action="/login.php">
+			<form method="POST" action="/ctrl/login.php">
 				<?php 
 				if(isset($GLOBALS['err'])) { 
 					echo $GLOBALS['err'];
@@ -75,6 +79,13 @@ function color_to_string(int $color)
 				<?php } ?>
 				</tr>
 			</table>
+			<form class="savebox">
+				<div class="savebox-container">
+				<input type="text" name="title" placeholder="Title"></input>
+				<input id="form_data" style="display:none;" type="text" name="image_data"></input>
+				<input type="submit"></input>
+				</div>
+			</form>
 		</div>
 		<?php } ?>
 		</body>

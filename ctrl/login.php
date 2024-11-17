@@ -1,9 +1,11 @@
 <?php
 
-require_once "db/user.php";
+set_include_path($_SERVER['DOCUMENT_ROOT']);
+spl_autoload_extensions('.php');
+spl_autoload_register();
 
-use DB\Connection;
-use DB\User;
+use mdl\connection;
+use mdl\user;
 
 session_start();
 
@@ -37,7 +39,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 		$username = htmlentities($_POST['username']);
 		$password = htmlentities($_POST['password']);
 
-		$user = User::fetch($username);
+		$user = user::fetch($username);
 
 		if($user->password_verify($password)) {
 			$_SESSION['user'] = $user;

@@ -1,25 +1,27 @@
 <?php
-
-namespace DB;
+namespace mdl;
 
 use \PDO       as PDO;
 use \Exception as Exception;
 
-class Connection extends PDO 
+class connection extends PDO 
 {
-	private static ?Connection $instance = null;
+	static private ?connection $instance = null;
 
 	public static function get()
 	{
 		if(is_null(self::$instance)) {
-			self::$instance = new Connection;
+			self::$instance = new connection;
 		}
 		return self::$instance;
 	} 
 
 	private function __construct()
 	{
-		parent::__construct("sqlite:art.db");
+		$cwd  = $_SERVER['DOCUMENT_ROOT'];
+		$path = $cwd . '/art.db';
+
+		parent::__construct('sqlite:' . $path);
 	}
 
 	private function drop(string $table_name) : bool
@@ -61,17 +63,7 @@ class Connection extends PDO
 		);');
 
 		/* add some test users */
-		User::insert("jack", "password");
-	}
-
-	public function add_picture(string $picture_data) : bool
-	{
-		$user = $_SESSION['user'];
-		$stmt = $this->prepare('INSERT INTO `pictures` (userid, date, data) (?,datetime("now"),?);');
-
-		return $stmt->execute([$user->id, $picture_data]);
-
-		return true;
+		user::insert("jack", "password");
 	}
 }
 ?>

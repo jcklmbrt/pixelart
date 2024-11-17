@@ -44,6 +44,18 @@ div.container {
 	border-radius: 6px;
 }
 
+form.savebox div.savebox-container {
+	padding: 1em;
+	margin: 1em;
+}
+
+form.savebox input {
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	border: 1px solid black;
+}
+
 div.container div.tools {
 	float: left;
 	display: block;
