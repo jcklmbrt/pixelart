@@ -1,14 +1,18 @@
 <?php
 
+namespace DB;
 
-class DatabaseConnection extends PDO 
+use \PDO       as PDO;
+use \Exception as Exception;
+
+class Connection extends PDO 
 {
-	private static ?DatabaseConnection $instance = null;
+	private static ?Connection $instance = null;
 
 	public static function get()
 	{
 		if(is_null(self::$instance)) {
-			self::$instance = new DatabaseConnection;
+			self::$instance = new Connection;
 		}
 		return self::$instance;
 	} 
@@ -52,7 +56,8 @@ class DatabaseConnection extends PDO
 			id        INTEGER PRIMARY KEY AUTOINCREMENT,
 			userid    INTEGER NOT NULL,
 			pictureid INTEGER NOT NULL,
-			date      DATETIME
+			date      DATETIME,
+			message   VARCHAR
 		);');
 
 		/* add some test users */

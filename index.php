@@ -1,11 +1,18 @@
 <?php
 
-require "db/database.php";
+require_once "db/user.php";
+use DB\Connection;
+use DB\User;
 
 session_start();
 
-$db = DatabaseConnection::get();
+$db = Connection::get();
 $db->migrate();
+
+function is_logged_in() : bool
+{
+	return isset($_SESSION['user']);
+}
 
 function color_to_string(int $color)
 {
@@ -31,7 +38,7 @@ function color_to_string(int $color)
 	</head>
 	<body onload="main()">
 		<nav>
-		<?php if(isset($_SESSION['user'])) { ?>
+		<?php if(is_logged_in()) { ?>
 			<?php $user = $_SESSION['user']; echo $user->username ?>
 			<a href="login.php">logout</a>
 		<?php } else { ?>
@@ -46,8 +53,9 @@ function color_to_string(int $color)
 				<input type="submit"></input>
 			</form>
 		<?php } ?>
-		</form>
 		</nav>
+
+		<?php if(is_logged_in()) { ?>
 		<div class="container">
 			<canvas id="canvas" width="350px" height="300px"></canvas>
 			<div class="tools">
@@ -68,5 +76,6 @@ function color_to_string(int $color)
 				</tr>
 			</table>
 		</div>
+		<?php } ?>
 		</body>
 </html>

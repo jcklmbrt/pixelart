@@ -1,17 +1,15 @@
 <?php
 
-session_start();
+require_once "db/user.php";
 
-include_once "db/database.php";
+use DB\Connection;
+use DB\User;
+
+session_start();
 
 define('USERNAME_MAX_LEN', 12);
 define('USERNAME_MIN_LEN', 3);
 
-
-function is_logged_in() : bool
-{
-	return isset($_SESSION['user']);
-}
 
 function is_valid_username(string $username) : bool
 {

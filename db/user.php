@@ -1,5 +1,5 @@
 <?php
-
+namespace DB;
 require_once 'db/connection.php';
 
 class User
@@ -18,21 +18,21 @@ class User
 
 	public static function insert($username, $password) : ?User
 	{
-		$db = DatabaseConnection::get();
+		$db = Connection::get();
 		$password_hash = password_hash($password, PASSWORD_BCRYPT);
 
 		$stmt = $db->prepare('INSERT INTO `users` (username, password) VALUES (?,?);');
 
 		if($stmt->execute([$username, $password_hash])) {
-			return self::fetch($username);
+			return new User($db->lastInsertId(), $username, $password);
 		} else {
-			return false;
+			return null;
 		}
 	}
 
 	public static function fetch($username) : ?User
 	{
-		$db = DatabaseConnection::get();
+		$db = Connection::get();
 		$stmt = $db->prepare('SELECT id, password FROM `users` WHERE username=?');
 		$stmt->execute([$username]);
 		$userdata = $stmt->fetch();
