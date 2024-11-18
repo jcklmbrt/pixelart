@@ -51,6 +51,7 @@ class connection extends PDO
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			userid INTEGER NOT NULL,
 			date   DATETIME,
+			title  VARCHAR,
 			data   VARCHAR
 		);');
 

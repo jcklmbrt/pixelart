@@ -1,6 +1,7 @@
 
 "use strict";
 
+var /* SaveBox */     savebox;
 var /* Palette */     palette;
 var /* PixelCanvas */ pixcanv;
 
@@ -8,35 +9,66 @@ const BLACK = 0x00;
 const WHITE = 0x3F;
 const PIXEL_SIZE = 10;
 
-class Palette
+class PopUp
 {
-	#elem;
+	_elem;
+
+	constructor(elem) 
+	{
+		this._elem = elem;
+	}
+
+	show(x, y)
+	{
+		if(this._elem.style.display == "block") {
+			this._elem.style.display = "none";
+		} else {
+			this._elem.style.display = "block";
+		}
+
+		this._elem.style.left = x.toString(10) + "px";
+		this._elem.style.top  = y.toString(10) + "px";
+	}
+
+	hide()
+	{
+		this._elem.style.display = "none";
+	}
+}
+
+class SaveBox extends PopUp
+{
+	show(x, y)
+	{
+		var form_data = document.getElementById("form_data");
+		form_data.value = pixcanv.to_base64();
+
+		super.show(x, y);
+	}
 
 	constructor()
 	{
-		this.#elem = document.getElementsByClassName("palette")[0];
+		var elem = document.getElementsByClassName("savebox")[0];
+		super(elem);
+
+		var colorbox = document.getElementById("save");
+		colorbox.addEventListener("mousedown", function(e) { 
+			savebox.show(e.clientX, e.clientY);
+		});
+	}
+}
+
+class Palette extends PopUp
+{
+	constructor()
+	{
+		var elem = document.getElementsByClassName("palette")[0];
+		super(elem);
 
 		var colorbox = document.getElementById("color");
 		colorbox.addEventListener("mousedown", function(e) { 
 			palette.show(e.clientX, e.clientY);
 		});
-	}
-
-	show(x, y)
-	{
-		if(this.#elem.style.display == "block") {
-			this.#elem.style.display = "none";
-		} else {
-			this.#elem.style.display = "block";
-		}
-
-		this.#elem.style.left = x.toString(10) + "px";
-		this.#elem.style.top  = y.toString(10) + "px";
-	}
-
-	hide()
-	{
-		this.#elem.style.display = "none";
 	}
 };
 
@@ -173,9 +205,6 @@ class PixelCanvas
 
 	draw()
 	{
-		var form_data = document.getElementById("form_data");
-		form_data.value = this.to_base64();
-
 		this.#ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		for(var y = 0; y < this.height; y++)
@@ -218,12 +247,14 @@ class BaseTool
 	interact(pixcanv, x, y) 
 	{
 		palette.hide();
+		savebox.hide();
 	}
 
 	set_color(color)
 	{
 		palette.hide();
-	
+		savebox.hide();
+
 		var col = document.getElementById("color");
 		col.style.background = color_to_string(color);
 
@@ -335,8 +366,14 @@ function color_to_string(color)
 
 function main() 
 {
-	palette = new Palette;
-	pixcanv = new PixelCanvas;
+	try {
+		palette = new Palette;
+		pixcanv = new PixelCanvas;
+		savebox = new SaveBox; 
+	} catch(e) {
+		/* no canvas */
+		return;
+	}
 
 	set_pencil();
 	set_tool_color(BLACK);

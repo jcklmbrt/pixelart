@@ -4,11 +4,11 @@ use \DateTime as DateTime;
 
 class comment
 {
-	public  int      $id;
-	private int      $user_id;
-	private int      $picture_id;
-	private DateTime $date;
-	private string   $message;
+	public int      $id;
+	public int      $user_id;
+	public int      $picture_id;
+	public DateTime $date;
+	public string   $message;
 
 	private function __construct(int $id, user $user, picture $picture, DateTime $date, string $message)
 	{

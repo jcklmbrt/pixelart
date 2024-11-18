@@ -2,42 +2,57 @@
 namespace mdl;
 
 use \DateTime as DateTime;
+use DB\Picture as DBPicture;
 use mdl\connection;
 use mdl\user;
 
 class picture
 {
-	public  int $id;
-	private int $user_id;
-	private DateTime $date;
-	private string   $data;
+	public  int      $id;
+	public user     $user;
+	public DateTime $date;
+	public string   $title;
+	public string   $data;
 
-	private function __construct(int $id, user $user, DateTime $date, string $data)
+	private function __construct(int $id, user $user, DateTime $date, string $title, string $data)
 	{
-		$this->id      = $id;
-		$this->user_id = $user->id;
-		$this->data    = $data;
+		$this->id    = $id;
+		$this->user  = $user;
+		$this->title = $title;
+		$this->data  = $data;
 	}
 
 	static public function list_pictures(user $user) : array
 	{
 		$db = connection::get();
-		$stmt = $db->prepare('SELECT id, userid, data FROM `pictures` WHERE userid=?');
+		$stmt = $db->prepare('SELECT P.id, U.username, P.userid, P.title, P.date, P.data 
+		                      FROM `pictures` P, `users` U 
+		                      WHERE userid=?');
+
+		$res = array();
 
 		if($stmt->execute([$user->id])) {
-			return $stmt->fetch();
-		} else {
-			return array();
+
+			$assoc = $stmt->fetchAll();
+			
+			foreach($assoc as $item) {
+				
+				$user = user::fetch($item['username']);
+				$p = new picture($item['id'], $user, new DateTime($item['date']), $item['title'],$item['data']);
+				array_push($res, $p);
+			}
 		}
+
+		return $res;
 	}
 
-	static public function insert_picture(user $user, string $data) : ?picture
+	static public function insert_picture(user $user, string $title, string $data) : ?picture
 	{
 		$db = connection::get();
-		$stmt = $db->prepare('INSERT INTO `pictures` (userid, date, data) (?,datetime("now"),?);');
+		$stmt = $db->prepare('INSERT INTO `pictures` (userid, date, title, data) VALUES (?,datetime("now"),?,?);');
 		
-		if($stmt->execute([$user->id, $data])) {
-			return new picture($db->lastInsertId(), $user, new DateTime('now'), $data);
+		if($stmt->execute([$user->id, $title, $data])) {
+			return new picture($db->lastInsertId(), $user, new DateTime('now'), $title, $data);
 		} else {
 			return null;
 		}

@@ -1,5 +1,8 @@
 
+
 html {
+	font-family: Arial, Helvetica, sans-serif;
+	font-weight: bold;
 	background-color: #EDFED8;
 }
 
@@ -9,6 +12,24 @@ nav {
 	background-color: #FFD1DC;
 	border-radius: 6px;
 	border: 1px solid black;
+}
+
+form.login {
+	border: 1px solid black;
+	display: inline-block;
+	height: fit-content;
+	padding: 1em;
+	margin: 30px;
+	border-spacing: 0;
+	background-color: #FFD1DC;
+	border-radius: 6px;
+}
+
+nav h1 {
+	margin: 0;
+	padding: 0;
+	display: block;
+	border-bottom: 1px solid black;
 }
 
 input {
@@ -33,7 +54,6 @@ div.container img {
 }
 
 div.container {
-	border: 1px solid black;
 	display: inline-block;
 	height: fit-content;
 	padding: 1em;
@@ -42,18 +62,22 @@ div.container {
 	border-spacing: 0;
 	background-color: #FFD1DC;
 	border-radius: 6px;
+	border: 1px solid black;
 }
 
-form.savebox div.savebox-container {
-	padding: 1em;
-	margin: 1em;
+form.savebox {
+	position: absolute;
+	border: 1px solid black;
+	border-radius: 6px;
+	background-color: #9EEEEE;
+	padding: 0.25em;
 }
 
 form.savebox input {
-	width: 100%;
-	padding: 0;
-	margin: 0;
+	padding: none;
+	border-spacing: 0;
 	border: 1px solid black;
+	box-sizing: border-box;
 }
 
 div.container div.tools {

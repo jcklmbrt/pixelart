@@ -15,7 +15,7 @@ class user
 		$this->password = $password;
 	}
 
-	public static function insert($username, $password) : ?user
+	public static function insert(string $username, string $password) : ?user
 	{
 		$db = connection::get();
 		$password_hash = password_hash($password, PASSWORD_BCRYPT);
@@ -29,7 +29,7 @@ class user
 		}
 	}
 
-	public static function fetch($username) : ?user
+	public static function fetch(string $username) : ?user
 	{
 		$db = connection::get();
 		$stmt = $db->prepare('SELECT id, password FROM `users` WHERE username=?');
@@ -46,7 +46,7 @@ class user
 		}
 	}
 
-	public function password_verify($password)
+	public function password_verify(string $password)
 	{
 		return password_verify($password, $this->password);
 	}
