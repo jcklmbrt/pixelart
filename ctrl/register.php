@@ -35,6 +35,12 @@ function valid_username(string $username, &$error) : bool
 		return false;
 	}
 
+	/* user already exists */
+	if(!is_null(user::fetch($username))) {
+		$error = 'A user with that name already exists';
+		return false;
+	}
+
 	return true;
 }
 
@@ -95,7 +101,8 @@ function valid_password(string $password, &$error) : bool
 function set_error($msg) : void 
 {
 	request::push_get('register_error', $msg);
-	request::relocate('/');
+	request::relocate("/");
+	die;
 }
 
 if(request::posted("username", "password", "password2")) {
@@ -118,7 +125,7 @@ if(request::posted("username", "password", "password2")) {
 	$user = user::insert($username, $password);
 
 	if(is_null($user)) {
-		set_error('A user with that name already exists');
+		set_error('Database error. Try again later');
 	}
 
 	$s->set_local_user($user);

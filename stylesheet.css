@@ -151,3 +151,9 @@ div.picture h4 {
 	display: block;
 	border-bottom: 1px solid black;
 }
+
+div.picture img {
+	image-rendering: pixelated;
+	width: 140px;
+	height: 120px;
+}

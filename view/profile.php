@@ -92,7 +92,7 @@ function image_data_to_bmp(string $data) : string
 		<div class="picture">
 			<h4> <?= $picture->title ?> </h4>
 			<?php $bmp = image_data_to_bmp($picture->data); ?>
-			<?php $src = 'data: bmp;base64,'.base64_encode($bmp); ?>
+			<?php $src = 'data:bmp;base64,' . base64_encode($bmp); ?>
 			<?= '<img src="'.$src.'">'; ?>
 		</div>
 	<?php } ?>
