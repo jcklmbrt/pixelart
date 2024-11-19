@@ -25,9 +25,10 @@ class picture
 	static public function list_pictures(user $user) : array
 	{
 		$db = connection::get();
-		$stmt = $db->prepare('SELECT P.id, U.username, P.userid, P.title, P.date, P.data 
-		                      FROM `pictures` P, `users` U 
-		                      WHERE userid=?');
+		$stmt = $db->prepare('SELECT id, title, date, data 
+		                      FROM `pictures`
+		                      WHERE userid=?
+				      ORDER BY date DESC');
 
 		$res = array();
 
@@ -36,9 +37,7 @@ class picture
 			$assoc = $stmt->fetchAll();
 			
 			foreach($assoc as $item) {
-				
-				$user = user::fetch($item['username']);
-				$p = new picture($item['id'], $user, new DateTime($item['date']), $item['title'],$item['data']);
+				$p = new picture($item['id'], $user, new DateTime($item['date']), $item['title'], $item['data']);
 				array_push($res, $p);
 			}
 		}
@@ -46,7 +45,7 @@ class picture
 		return $res;
 	}
 
-	static public function insert_picture(user $user, string $title, string $data) : ?picture
+	static public function insert(user $user, string $title, string $data) : ?picture
 	{
 		$db = connection::get();
 		$stmt = $db->prepare('INSERT INTO `pictures` (userid, date, title, data) VALUES (?,datetime("now"),?,?);');

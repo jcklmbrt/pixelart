@@ -20,6 +20,11 @@ class user
 		$db = connection::get();
 		$password_hash = password_hash($password, PASSWORD_BCRYPT);
 
+		/* user already exists */
+		if(!is_null(self::fetch($username))) {
+			return null;
+		}
+
 		$stmt = $db->prepare('INSERT INTO `users` (username, password) VALUES (?,?);');
 
 		if($stmt->execute([$username, $password_hash])) {

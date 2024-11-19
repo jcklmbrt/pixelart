@@ -24,6 +24,7 @@ $db = connection::get();
 		if($s->logged_in()) {
 			include 'view/nav-bar.php';
 			include 'view/editor.php';
+			include 'view/profile.php';
 		} else {
 			include 'view/login-form.php';
 			include 'view/register-form.php';

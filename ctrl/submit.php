@@ -46,18 +46,12 @@ if(request::posted('title', 'image_data')) {
 	$image_data = htmlentities($_POST['image_data']);
 
 	if(verify_image_data($image_data)) {
-		picture::insert_picture($user, $title, $image_data);
+		picture::insert($user, $title, $image_data);
 	} else {
-		echo 'bad image data';
+		request::push_get('err', 'bad image data');
 	}
-
-	foreach(picture::list_pictures($user) as $picture) {
-		echo '<p>' . $picture->title . ": " . $picture->user->username . '</p>';
-	}
-
-	print_r(picture::list_pictures($user));
 }
 
-//request::relocate("/", []);
+request::relocate('/');
 
 ?>

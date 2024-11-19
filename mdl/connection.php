@@ -67,9 +67,6 @@ class connection extends PDO
 			date      DATETIME,
 			message   VARCHAR
 		);');
-
-		/* add some test users */
-		user::insert("jack", "password");
 	}
 }
 ?>

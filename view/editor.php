@@ -36,7 +36,7 @@ function color_to_string(int $color)
 		<tr>
 		<?php for($i = 0; $i < 64; $i += 1) { ?>
 			<?php if($i % 8 == 0) { echo "</tr><tr>"; } ?>
-			<?php echo "<td style='background-color:" . color_to_string($i) . "' onclick='set_tool_color(" . $i . ")'></td>"; ?>
+			<?= "<td style='background-color:" . color_to_string($i) . "' onclick='set_tool_color(" . $i . ")'></td>"; ?>
 		<?php } ?>
 		</tr>
 	</table>
