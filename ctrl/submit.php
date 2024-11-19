@@ -10,6 +10,81 @@ use mdl\user;
 
 $s = new session;
 
+function image_data_to_bmp(string $data) : string
+{
+	$width  = 35;
+	$height = 30;
+
+	$pixels   = array();
+	$padding  = $width % 4;
+	$row_size = $width * 3 + $padding;
+	$bmp_size = $row_size * $height;
+	$hdr_size = 54;
+
+	for($y = $height - 1; $y >= 0; $y--) {
+		for($x = 0; $x < $width; $x++) {
+			$color = ord($data[$y*$width+$x]) - ord('0');
+			$blue  = ($color >> 0) & 3;
+			$green = ($color >> 2) & 3;
+			$red   = ($color >> 4) & 3;
+
+			$blue  = ($blue  / 3.0) * 255;
+			$green = ($green / 3.0) * 255;
+			$red   = ($red   / 3.0) * 255;
+
+			array_push($pixels, $blue);
+			array_push($pixels, $green);
+			array_push($pixels, $red);
+		}
+		/* pad row */
+		for($i = 0; $i < $width % 4; $i++) {
+			array_push($pixels, 0);
+		}
+	}
+
+	return pack(
+		/* BITMAPFILEHEADER */
+		'v'. /* magic */
+		'V'. /* file size */
+		'V'. /* reserved */
+		'V'. /* offset to bitmap data */
+		/* BITMAPV5HEADER */
+		'V'. /* Header Size */
+		'V'. /* Width */
+		'V'. /* Height */
+		'v'. /* Planes */
+		'v'. /* Bits per pixel */
+		'V'. /* Compression */
+		'V'. /* Image Size */
+		'V'. /* X pixels per meter */
+		'V'. /* Y pixels per meter */
+		'V'. /* No. Colors used */
+		'V'. /* No. Important colors */
+		/* Pixel Array */
+		'C' . $bmp_size,
+
+		/* BITMAPFILEHEADER */
+		0x4D42,                /* magic */
+		$bmp_size + $hdr_size, /* file size */
+		0,                     /* reserved */
+		$hdr_size,             /* offset to data */
+		
+		/* BITMAPV5HEADER */
+		40,        /* Header Size */
+		$width,    /* Width */
+		$height,   /* Height */
+		0,         /* Planes */
+		24,        /* Bits per pixel */
+		0,         /* Compression */
+		$bmp_size, /* Image Size */
+		0, 0,      /* x,y Pixels per meter */
+		0, 0,      /* No. Color Used,Important */
+
+		/* Pixel Array */
+		...$pixels
+	);
+}
+
 function verify_image_data(string $image_data) : bool 
 {
 	$canvas_height = 300;
@@ -46,7 +121,11 @@ if(request::posted('title', 'image_data')) {
 	$image_data = htmlentities($_POST['image_data']);
 
 	if(verify_image_data($image_data)) {
-		picture::insert($user, $title, $image_data);
+		/* convert from our custom 6bit base64 format to 24bit BMP, 
+		   then back to base64 to be embedded in an img tag. */
+		$bmp = image_data_to_bmp($image_data);
+		$b64 = base64_encode($bmp);
+		picture::insert($user, $title, $b64);
 	} else {
 		request::push_get('err', 'bad image data');
 	}
