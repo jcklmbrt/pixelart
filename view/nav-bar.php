@@ -4,6 +4,6 @@
 <?php if($s->logged_in()) { ?>
 	<nav>
 		<?php echo $s->get_local_user()->username; ?>
-		<a href="ctrl/login.php"><button>logout</button></a>
+		<a href="ctrl/login.php"><button>Logout</button></a>
 	</nav>
 <?php } ?>

@@ -20,8 +20,13 @@ class connection extends PDO
 	{
 		$cwd  = $_SERVER['DOCUMENT_ROOT'];
 		$path = $cwd . '/art.db';
+		$new  = !file_exists($path);
 
 		parent::__construct('sqlite:' . $path);
+
+		if($new) {
+			$this->migrate();
+		}
 	}
 
 	private function drop(string $table_name) : bool

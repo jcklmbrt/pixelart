@@ -10,26 +10,6 @@ use mdl\user;
 
 $s  = new session;
 $db = connection::get();
-//$db->migrate();
-
-function is_logged_in() : bool
-{
-	return isset($_SESSION['user']);
-}
-
-function color_to_string(int $color)
-{
-	/* color encoding: 0bAARRGGBB */
-	$blue  = ($color >> 0) & 3;
-	$green = ($color >> 2) & 3;
-	$red   = ($color >> 4) & 3;
-
-	$blue  = ($blue  / 3.0) * 255;
-	$green = ($green / 3.0) * 255;
-	$red   = ($red   / 3.0) * 255;
-
-	return "rgb(" . $red . "," . $green . "," . $blue . ")";
-}
 
 ?>
 
@@ -46,6 +26,7 @@ function color_to_string(int $color)
 			include 'view/editor.php';
 		} else {
 			include 'view/login-form.php';
+			include 'view/register-form.php';
 		}
 
 		?>

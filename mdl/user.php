@@ -32,16 +32,15 @@ class user
 	public static function fetch(string $username) : ?user
 	{
 		$db = connection::get();
-		$stmt = $db->prepare('SELECT id, password FROM `users` WHERE username=?');
+		$stmt = $db->prepare('SELECT id, password FROM `users` WHERE username=? LIMIT 1');
 		$stmt->execute([$username]);
 		$userdata = $stmt->fetch();
-
-		$userid   = $userdata['id'];
-		$password = $userdata['password'];
 
 		if($userdata == FALSE) {
 			return null;
 		} else {
+			$userid   = $userdata['id'];
+			$password = $userdata['password'];
 			return new user($userid, $username, $password);
 		}
 	}

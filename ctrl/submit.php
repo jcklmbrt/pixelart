@@ -58,6 +58,6 @@ if(request::posted('title', 'image_data')) {
 	print_r(picture::list_pictures($user));
 }
 
-//header('Location: /');
+//request::relocate("/", []);
 
 ?>
