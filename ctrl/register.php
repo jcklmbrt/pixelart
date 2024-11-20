@@ -100,6 +100,7 @@ function valid_password(string $password, &$error) : bool
 
 function set_error($msg) : void 
 {
+	request::push_get('page', 'register');
 	request::push_get('register_error', $msg);
 	request::relocate("/");
 	die;

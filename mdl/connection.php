@@ -18,7 +18,7 @@ class connection extends PDO
 
 	private function __construct()
 	{
-		$cwd  = $_SERVER['DOCUMENT_ROOT'];
+		$cwd  = $_SERVER['DOCUMENT_ROOT'] . '/..';
 		$path = $cwd . '/art.db';
 		$new  = !file_exists($path);
 
@@ -40,7 +40,7 @@ class connection extends PDO
 		}
 	}
 
-	public function migrate() : void
+	private function migrate() : void
 	{
 		$this->drop('users');
 		$this->drop('pictures');

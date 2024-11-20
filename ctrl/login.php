@@ -20,6 +20,7 @@ if(request::posted("username", "password")) {
 	if(!is_null($user) && $user->password_verify($password)) {
 		$s->set_local_user($user);
 	} else {
+		request::push_get('page', 'login');
 		request::push_get('login_error', 'Invalid username or password');
 	}
 } else {

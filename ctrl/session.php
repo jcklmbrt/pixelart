@@ -10,6 +10,15 @@ class session
 		if(session_status() != PHP_SESSION_ACTIVE) {
 			session_start();
 		}
+		/* destroy session on DB update */
+		if($this->logged_in()) {
+			$user = $this->get_local_user();
+			/* user no longer exists */
+			if(is_null(user::fetch($user->username))) {
+				$this->destroy();
+				$this->__construct();
+			}
+		}
 	}
 
 	function logged_in() : bool

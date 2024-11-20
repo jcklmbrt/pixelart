@@ -114,11 +114,21 @@ function verify_image_data(string $image_data) : bool
 	return true;
 }
 
+const MAX_TITLE = 12;
+
 if(request::posted('title', 'image_data')) {
 
 	$user = $s->get_local_user();
 	$title      = htmlentities($_POST['title']);
 	$image_data = htmlentities($_POST['image_data']);
+
+	if($title == "") {
+		$title = "untitled";
+	}
+
+	if(strlen($title) > MAX_TITLE) {
+		$title = substr($title, 0, MAX_TITLE);
+	}
 
 	if(verify_image_data($image_data)) {
 		/* convert from our custom 6bit base64 format to 24bit BMP, 

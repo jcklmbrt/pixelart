@@ -2,7 +2,6 @@
 namespace mdl;
 
 use \DateTime as DateTime;
-use DB\Picture as DBPicture;
 use mdl\connection;
 use mdl\user;
 
@@ -37,6 +36,31 @@ class picture
 			$assoc = $stmt->fetchAll();
 			
 			foreach($assoc as $item) {
+				$p = new picture($item['id'], $user, new DateTime($item['date']), $item['title'], $item['data']);
+				array_push($res, $p);
+			}
+		}
+
+		return $res;
+	}
+
+	static public function most_recent(int $num) : array
+	{
+		$db = connection::get();
+		$stmt = $db->prepare('SELECT P.id, U.username, P.title, P.date, P.data 
+		                      FROM `pictures` P, `users` U
+				      WHERE U.id == P.userid
+				      ORDER BY date DESC
+				      LIMIT ?');
+
+		$res = array();
+
+		if($stmt->execute([$num])) {
+
+			$assoc = $stmt->fetchAll();
+			
+			foreach($assoc as $item) {
+				$user = user::fetch($item['username']);
 				$p = new picture($item['id'], $user, new DateTime($item['date']), $item['title'], $item['data']);
 				array_push($res, $p);
 			}
