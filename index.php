@@ -21,6 +21,7 @@ $s = new session;
 		<?php
 
 		$page = request::get('page');
+		$user = request::get('user');
 
 		include 'view/nav-bar.php';
 
@@ -39,7 +40,12 @@ $s = new session;
 				break;
 			}
 		} else {
-			include 'view/gallery.php';
+
+			if(is_null($user)) {
+				include 'view/gallery.php';
+			} else {
+				include 'view/profile.php';
+			}
 		}
 
 		?>

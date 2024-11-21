@@ -20,7 +20,7 @@ function color_to_string(int $color)
 <!-- Include the javascript required for the editor -->
 <script type="text/javascript" src="js/pixelart.js"></script>
 
-<div class="container">
+<div class="editor">
 	<canvas id="canvas" width="350px" height="300px"></canvas>
 	<div class="tools">
 		<img src="img/pencil.png"       onclick="set_pencil()"></img>

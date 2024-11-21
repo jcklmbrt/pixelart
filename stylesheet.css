@@ -1,11 +1,39 @@
 
-
+/* BASIC HTML ELEMENTS */
 html {
 	font-family: Arial, Helvetica, sans-serif;
 	background-color: #EDFED8;
 	font-weight: bold;
 }
 
+h1 {
+	display: inline;
+	font-weight: lighter;
+	font-style: italic;
+	margin-top: 0;
+	margin-bottom: 0.5em;
+}
+
+img {
+	image-rendering: pixelated;
+}
+
+input {
+	display: block;
+	margin: 1em;
+	border-spacing: 0;
+	border: 1px solid black;
+	box-sizing: border-box;
+}
+
+canvas {
+	border: 1px solid black;
+	margin: 0;
+	padding: 0;
+	background-color: white;
+}
+
+/* NAV BAR */
 nav {
 	float: right;
 	background-color: #FFD1DC;
@@ -17,18 +45,59 @@ nav span {
 	margin: 1em;
 }
 
-img {
-	image-rendering: pixelated;
-}
-
 nav button {
 	font-weight: bold;
 	padding: 1em;
 	margin: 1em;
 	border: 1px solid black;
 	border-radius: 6px;
+	background-color: #baf0f0;
 }
 
+/* GALLERY */
+table.gallery {
+	padding: 1em;
+	display: block;
+	width: 100%;
+}
+
+table.gallery td,tr,th {
+	padding: 1em;
+}
+
+table.gallery th {
+	 padding: 0;
+	 text-align: left;
+	 border-bottom: 1px solid black;
+}
+
+table.gallery form.comment {
+	margin: 1em;
+	border: 1px solid black;
+	display: inline-block;
+	height: fit-content;
+	border-spacing: 0;
+	background-color: #FFD1DC;
+	border-radius: 6px;
+}
+
+table.gallery div.comment {
+	font-weight: normal;
+	display: block;
+}
+
+table.gallery img {
+	width: 140px;
+	height: 120px;
+}
+
+table.gallery form textarea {
+	display: block;
+	border: 1px solid black;
+	margin: 1em;
+}
+
+/* LOGIN/REGISTER FORM */
 div.form-container {
 	position: absolute;
 	margin-left: 50%;
@@ -42,7 +111,7 @@ div.form-container {
 	border-radius: 6px;
 }
 
-div.form-container div.title {
+div.title {
 	display: block;
 	border-top-left-radius: 6px;
 	border-top-right-radius: 6px;
@@ -52,15 +121,7 @@ div.form-container div.title {
 	padding: 1em;
 }
 
-h1 {
-	display: inline;
-	font-weight: lighter;
-	font-style: italic;
-	margin-top: 0;
-	margin-bottom: 0.5em;
-}
-
-div.form-container div.title small {
+div.title small {
 	display: block;
 	margin: 0;
 	padding: 0;
@@ -70,35 +131,15 @@ div.form-container form {
 	padding: 1em;
 }
 
-input {
-	display: block;
-	margin: 1em;
-}
-
-canvas {
-	border: 1px solid black;
-	margin: 0;
-	padding: 0;
-	background-color: white;
-}
-
-form.login div.error {
+div.form-container form div.error {
 	color: darkred;
 	font-size: smaller;
 	padding: 0;
 	margin: 0;
 }
 
-div.container img {
-	position: relative;
-	display:block;
-	margin: auto;
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
-	padding: auto;
-}
-
-div.container {
+/* EDITOR */
+div.editor {
 	display: inline-block;
 	height: fit-content;
 	padding: 1em;
@@ -110,22 +151,24 @@ div.container {
 	border: 1px solid black;
 }
 
+div.editor img {
+	position: relative;
+	display:block;
+	margin: auto;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	padding: auto;
+}
+
 form.savebox {
 	position: absolute;
 	border: 1px solid black;
 	border-radius: 6px;
-	background-color: #9EEEEE;
+	background-color: #baf0f0;
 	padding: 0.2em;
 }
 
-input {
-	padding: none;
-	border-spacing: 0;
-	border: 1px solid black;
-	box-sizing: border-box;
-}
-
-div.container div.tools {
+div.editor div.tools {
 	float: left;
 	display: block;
 	width: 2.5em;
@@ -161,55 +204,4 @@ table.palette td {
 	margin: 0;
 	width: 10px;
 	height: 10px;
-}
-
-table.display-table {
-	border-spacing: 0;
-	padding: 0;
-	margin: 0;
-	border: 0px solid black;
-}
-
-table.display-table tr {
-	padding: 0;
-	margin: 0;
-}
-
-table.display-table td {
-	padding: 0;
-	margin: 0;
-	width: 5px;
-	height: 5px;
-}
-
-div.picture {
-	margin: 1em;
-}
-
-div.picture h4 {
-	display: block;
-	border-bottom: 1px solid black;
-}
-
-div.picture img {
-	display: block;
-	width: 140px;
-	height: 120px;
-}
-
-div.picture form input {
-	display: block;
-}
-
-div.picture form textarea {
-	display: block;
-}
-
-div.picture form label {
-	display: block;
-}
-
-div.gallery {
-	padding: 1em;
-	margin: 1em;
 }

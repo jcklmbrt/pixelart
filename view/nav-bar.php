@@ -1,9 +1,7 @@
 
-<?php
+<?php use ctrl\request; ?>
+<?php $s = new ctrl\session; ?>
 
-use ctrl\request;
-
- $s = new ctrl\session; ?>
 <nav>
 <?php if($s->logged_in()) { ?>
 	<span class="outer">

@@ -6,7 +6,7 @@
 		<h1>Register</h1>
 		<small>[<a href="/?page=login">already have an account?</a>]</small>
 	</div>
-	<form method="POST" action="/ctrl/register.php" class="login">
+	<form method="POST" action="/ctrl/register.php">
 	<label>Username:</label><input type="text"     name="username"></input>
 	<label>Password:</label><input type="password" name="password"></input>
 	<label>Re-enter Password:</label><input type="password" name="password2"></input>

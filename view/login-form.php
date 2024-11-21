@@ -6,7 +6,7 @@
 		<h1>Login</h1>
 		<small>[<a href="/?page=register">create a new account</a>]</small>
 	</div>
-	<form method="POST" action="/ctrl/login.php" class="login">
+	<form method="POST" action="/ctrl/login.php">
 		<label>Username:</label><input type="text"     name="username"></input>
 		<label>Password:</label><input type="password" name="password"></input>
 		<input type="submit" value="Submit"></input>

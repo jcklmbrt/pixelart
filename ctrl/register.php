@@ -20,11 +20,6 @@ function valid_username(string $username, &$error) : bool
 {
 	$len = strlen($username);
 
-	if(!ctype_alnum($username)) {
-		$error = 'Username must be alphanumeric';
-		return false;
-	}
-
 	if($len > MAX_USERNAME) {
 		$error = 'Username must be shorter than ' . MAX_USERNAME . ' chars';
 		return false;
@@ -32,6 +27,11 @@ function valid_username(string $username, &$error) : bool
 
 	if($len < MIN_USERNAME) {
 		$error = 'Username must be longer than ' . MIN_USERNAME . ' chars';
+		return false;
+	}
+
+	if(!ctype_alnum($username)) {
+		$error = 'Username must be alphanumeric';
 		return false;
 	}
 

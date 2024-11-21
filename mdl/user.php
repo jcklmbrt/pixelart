@@ -45,6 +45,22 @@ class user
 		}
 	}
 
+	public static function from_id(int $id) : ?user 
+	{
+		$db = connection::get();
+		$stmt = $db->prepare('SELECT username, password FROM `users` WHERE id=? LIMIT 1');
+		$stmt->execute([$id]);
+		$userdata = $stmt->fetch();
+
+		if($userdata == FALSE) {
+			return null;
+		} else {
+			$username = $userdata['username'];
+			$password = $userdata['password'];
+			return new user($id, $username, $password);
+		}
+	}
+
 	public function password_verify(string $password)
 	{
 		return password_verify($password, $this->password);

@@ -5,30 +5,39 @@ use \DateTime as DateTime;
 class comment
 {
 	public int      $id;
-	public int      $user_id;
-	public int      $picture_id;
+	public user     $user;
+	public picture  $picture;
 	public DateTime $date;
 	public string   $message;
 
 	private function __construct(int $id, user $user, picture $picture, DateTime $date, string $message)
 	{
-		$this->id         = $id;
-		$this->user_id    = $user->id;
-		$this->picture_id = $picture->id;
-		$this->date       = $date;
-		$this->message    = $message;
+		$this->id      = $id;
+		$this->user    = $user;
+		$this->picture = $picture;
+		$this->date    = $date;
+		$this->message = $message;
 	}
 
 	static public function list_comments(picture $picture) : array
 	{
 		$db = connection::get();
-		$stmt = $db->prepare('SELECT id, userid, pictureid, date, message FROM `pictures` WHERE pictureid=?');
+		$stmt = $db->prepare('SELECT id, userid, pictureid, date, message FROM `comments` WHERE pictureid=? ORDER BY date DESC');
+
+		$res = array();
 
 		if($stmt->execute([$picture->id])) {
-			return $stmt->fetch();
-		} else {
-			return array();
+			$assoc = $stmt->fetchAll();
+			if($assoc != FALSE) {
+				foreach($assoc as $item) {
+					$user = user::from_id($item['userid']);
+					$comment = new comment($item['id'], $user, $picture, new DateTime($item['date']), $item['message']);
+					array_push($res, $comment);
+				}
+			}
 		}
+
+		return $res;
 	}
 
 	static public function comment(user $user, picture $picture, string $message) : ?comment

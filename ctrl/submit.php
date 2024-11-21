@@ -114,7 +114,7 @@ function verify_image_data(string $image_data) : bool
 	return true;
 }
 
-const MAX_TITLE = 12;
+const MAX_TITLE = 24;
 
 if(request::posted('title', 'image_data')) {
 

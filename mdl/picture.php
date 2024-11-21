@@ -69,6 +69,24 @@ class picture
 		return $res;
 	}
 
+	static public function from_id(int $id) : ?picture
+	{
+		$db = connection::get();
+		$stmt = $db->prepare('SELECT U.id, P.title, P.date, P.data 
+		                      FROM `pictures` P, `users` U
+				      WHERE U.id == P.userid
+				      AND   P.id == ?
+				      LIMIT 1');
+
+		if($stmt->execute([$id])) {
+			$item = $stmt->fetch();
+			$user = user::from_id($item['id']);
+			return new picture($id, $user, new DateTime($item['date']), $item['title'], $item['data']);
+		} else {
+			return null;
+		}
+	}
+
 	static public function insert(user $user, string $title, string $data) : ?picture
 	{
 		$db = connection::get();

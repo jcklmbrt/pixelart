@@ -1,12 +1,19 @@
+
+<?php use mdl\user;    ?>
 <?php use mdl\comment; ?>
 <?php use mdl\picture; ?>
+<?php use ctrl\request; ?>
 <?php $s = new ctrl\session; ?>
+
+<?php $user = request::get('user'); ?>
+<?php $user = user::fetch($user);   ?>
+<?php if(!is_null($user)) { ?>
 
 <table class="gallery">
 	<tr>
-		<td><h1>Most Recent Artwork</h1></td>
+		<td><h1> <?= $user->username . "'s Artwork" ?> </h1></td>
 	</tr>
-	<?php foreach(picture::most_recent(10) as $picture) { ?>
+	<?php foreach(picture::list_pictures($user) as $picture) { ?>
 		<tr>
 			<th colspan="2"> <?= $picture->title ?> by <?= $picture->user->username ?> </th>
 		</tr>
@@ -27,7 +34,6 @@
 			<div class="comment-container">
 			<?php foreach(comment::list_comments($picture) as $comment) { ?>
 				<div class="comment">
-					<small style="color:gray"><?= $comment->date->format('H:i j/m/y'); ?></small>
 					<?= $comment->user->username ?> says: <?= $comment->message ?>
 				</div>
 			<?php } ?>
@@ -37,3 +43,5 @@
 	<?php } ?>
 	</tr>
 </table>
+
+<?php } ?>
