@@ -136,6 +136,7 @@ if(request::posted('title', 'image_data')) {
 		$bmp = image_data_to_bmp($image_data);
 		$b64 = base64_encode($bmp);
 		picture::insert($user, $title, $b64);
+		$s->set_page($user);
 	} else {
 		request::push_get('err', 'bad image data');
 	}

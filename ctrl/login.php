@@ -19,9 +19,9 @@ if(request::posted("username", "password")) {
 	/* assuming if stmt will short-circuit */
 	if(!is_null($user) && $user->password_verify($password)) {
 		$s->set_local_user($user);
+		$s->set_page("home");
 	} else {
-		request::push_get('page', 'login');
-		request::push_get('login_error', 'Invalid username or password');
+		$s->err_push('Invalid username or password');
 	}
 } else {
 	/* logout */

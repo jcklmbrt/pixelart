@@ -44,6 +44,37 @@ class session
 		}
 	}
 
+	function set_page(string | user $page) 
+	{
+		$_SESSION['page'] = $page;
+	}
+
+	function page() : string | user
+	{
+		if(isset($_SESSION['page'])) {
+			return $_SESSION['page'];
+		} else {
+			return 'home';
+		}
+	}
+
+	function err_pop() : ?string
+	{
+		if(isset($_SESSION['err'])) {
+			return array_pop($_SESSION['err']);
+		} else {
+			return null;
+		}
+	}
+
+	function err_push(string $msg) : void
+	{
+		if(!isset($_SESSION['err'])) {
+			$_SESSION['err'] = array();
+		}
+		array_push($_SESSION['err'], $msg);
+	}
+
 	function destroy()
 	{
 		session_destroy();

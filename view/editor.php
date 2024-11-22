@@ -1,5 +1,7 @@
 <?php
 
+use ctrl\session;
+
 function color_to_string(int $color)
 {
 	/* color encoding: 0bAARRGGBB */
@@ -14,6 +16,9 @@ function color_to_string(int $color)
 	return "rgb(" . $red . "," . $green . "," . $blue . ")";
 }
 
+$s = new session;
+
+if($s->logged_in()) {
 ?>
 
 
@@ -23,9 +28,9 @@ function color_to_string(int $color)
 <div class="editor">
 	<canvas id="canvas" width="350px" height="300px"></canvas>
 	<div class="tools">
-		<img src="img/pencil.png"       onclick="set_pencil()"></img>
-		<img src="img/bucket.png"       onclick="set_bucket()"></img>
-		<img src="img/color-picker.png" onclick="set_color_picker()"></img>
+		<img src="img/pencil.png"       onclick="set_pencil()" id="pencil" class="tool-icon"></img>
+		<img src="img/bucket.png"       onclick="set_bucket()" id="bucket" class="tool-icon"></img>
+		<img src="img/color-picker.png" onclick="set_color_picker()" id="color-picker" class="tool-icon"></img>
 		<button id="color"></button>
 		<img src="img/undo.png"         onclick="canvas_undo()"></img>
 		<img src="img/redo.png"         onclick="canvas_redo()"></img>
@@ -46,3 +51,5 @@ function color_to_string(int $color)
 		<input type="submit" value="Save"></input>
 	</form>
 </div>
+
+<?php } ?>

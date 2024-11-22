@@ -1,14 +1,37 @@
+
+<?php use mdl\user;    ?>
 <?php use mdl\comment; ?>
 <?php use mdl\picture; ?>
-<?php $s = new ctrl\session; ?>
+<?php use ctrl\request; ?>
+
+<?php $s    = new ctrl\session; ?>
+<?php $user = $s->page();       ?>
+<?php $is_user = !is_null($user) && $user instanceof user;
+if($is_user) { 
+	$pictures = picture::list_pictures($user);
+} else {
+	$pictures = picture::most_recent(100);
+}
+	
+	
+?>
 
 <table class="gallery">
 	<tr>
-		<td><h1>Most Recent Artwork</h1></td>
+		<?php if($is_user) { ?>
+			<td colspan="2"><h1> <?= $user->username . "'s Artwork" ?> </h1></td>
+		<?php } else { ?>
+			<td colspan="2"><h1>Most Recent Artwork</h1></td>
+		<?php } ?>
 	</tr>
-	<?php foreach(picture::most_recent(10) as $picture) { ?>
+	<?php foreach($pictures as $picture) { ?>
+		<?php $username = $picture->user->username; ?>
+		<?php $userlink = "<a href='/?user=" . $username . "'>" . $username . '</a>'; ?>
 		<tr>
-			<th colspan="2"> <?= $picture->title ?> by <?= $picture->user->username ?> </th>
+			<th colspan="2"> 
+				<?= $picture->title ?> by <?= $userlink ?> 
+				<small><?= $picture->date->format('H:i j/m/y'); ?></small>
+			</th>
 		</tr>
 		<tr>
 			<td>
@@ -25,10 +48,17 @@
 			<?php } ?>
 
 			<div class="comment-container">
-			<?php foreach(comment::list_comments($picture) as $comment) { ?>
+			<?php $comments = comment::list_comments($picture) ?>
+			<?php if(count($comments) == 0) { ?>
 				<div class="comment">
-					<small style="color:gray"><?= $comment->date->format('H:i j/m/y'); ?></small>
-					<?= $comment->user->username ?> says: <?= $comment->message ?>
+					<small>&ast; no comments &ast;</small>
+				</div>
+			<?php } else foreach(comment::list_comments($picture) as $comment) { ?>
+				<?php $username = $comment->user->username; ?>
+				<?php $userlink = "<a href='/?user=" . $username . "'>" . $username . '</a>'; ?>
+				<div class="comment">
+					<small><?= $comment->date->format('H:i j/m/y'); ?></small>
+					<?= $userlink . ': ' . $comment->message ?>
 				</div>
 			<?php } ?>
 			</div>

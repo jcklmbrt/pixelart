@@ -162,6 +162,16 @@ class PixelCanvas
 			}
 		});
 
+		this.#canvas.addEventListener("touchstart", function(e) {
+			pixcanv.mouse_down = true;
+			pixcanv.onchange();
+			pixcanv.ontouch(e);
+		});
+
+		this.#canvas.addEventListener("touchmove", function(e) {
+			pixcanv.ontouch(e);
+		});
+
 		var unsel = function() {
 			pixcanv.mouse_down = false;
 			pixcanv.check_history();
@@ -169,6 +179,21 @@ class PixelCanvas
 	
 		this.#canvas.addEventListener("mouseup",  unsel);
 		this.#canvas.addEventListener("mouseout", unsel);
+
+		this.#canvas.addEventListener("touchcancel", unsel);
+		this.#canvas.addEventListener("touchend", unsel);
+	}
+
+	ontouch(e)
+	{
+		var left = this.#canvas.getBoundingClientRect().left;
+		var top  = this.#canvas.getBoundingClientRect().top;
+
+		var touches = e.touches;
+		for(var i = 0; i < touches.length; i++) {
+			var item = touches.item(i);
+			this.mousemove(item.clientX - left, item.clientY - top);
+		}
 	}
 
 	mousemove(x, y)
@@ -242,6 +267,26 @@ class BaseTool
 		} else {
 			this.set_color(BLACK);
 		}
+
+		var icons = document.getElementsByClassName("tool-icon");
+		for(var i = 0; i < icons.length; i++) {
+			icons[i].style.filter = "none";
+		}
+	}
+
+	outline_elem(elem)
+	{
+		var color = color_to_string(this._color);
+		/* var neg   = color_to_string(~color); */
+
+		elem.style.filter = "drop-shadow(-1px  1px 0 " + color + ")" +
+		                    "drop-shadow( 1px -1px 0 " + color + ")" +
+		                    "drop-shadow( 1px  1px 0 " + color + ")" +
+		                    "drop-shadow(-1px -1px 0 " + color + ")" /* +
+		                    "drop-shadow(-1px  1px 0 " + neg   + ")" +
+		                    "drop-shadow( 1px -1px 0 " + neg   + ")" +
+		                    "drop-shadow( 1px  1px 0 " + neg   + ")" +
+		                    "drop-shadow(-1px -1px 0 " + neg   + ")" */;
 	}
 
 	interact(pixcanv, x, y) 
@@ -268,12 +313,20 @@ class PencilTool extends BaseTool
 	{
 		pixcanv.set_cursor("img/pencil.png");
 		super();
+		this.outline_elem();
+	}
+
+	outline_elem() 
+	{
+		var icon = document.getElementById("pencil");
+		super.outline_elem(icon);
 	}
 
 	interact(pixcanv, x, y) /* override */
 	{
 		pixcanv.set_pixel(x, y, this._color);
 		super.interact(pixcanv, x, y);
+		this.outline_elem();
 	}
 };
 
@@ -283,6 +336,13 @@ class BucketTool extends BaseTool
 	{
 		pixcanv.set_cursor("img/bucket.png");
 		super();
+		this.outline_elem();
+	}
+
+	outline_elem() 
+	{
+		var icon = document.getElementById("bucket");
+		super.outline_elem(icon);
 	}
 
 	interact(pixcanv, x, y) /* override */
@@ -330,6 +390,13 @@ class ColorPicker extends BaseTool
 	{
 		pixcanv.set_cursor("img/color-picker.png");
 		super();
+		this.outline_elem();
+	}
+
+	outline_elem() 
+	{
+		var icon = document.getElementById("color-picker");
+		super.outline_elem(icon);
 	}
 
 	interact(pixcanv, x, y) /* override */
@@ -344,7 +411,7 @@ class ColorPicker extends BaseTool
 function set_bucket()          { pixcanv.tool = new BucketTool; }
 function set_pencil()          { pixcanv.tool = new PencilTool; }
 function set_color_picker()    { pixcanv.tool = new ColorPicker; }
-function set_tool_color(color) { pixcanv.tool.set_color(color); }
+function set_tool_color(color) { pixcanv.tool.set_color(color); pixcanv.tool.outline_elem(); }
 function canvas_reset()        { pixcanv.clear_pixels(); pixcanv.draw(); pixcanv.onchange(); /* in case we want to undo the reset */ }
 function canvas_undo()         { pixcanv.undo() }
 function canvas_redo()         { pixcanv.redo() }

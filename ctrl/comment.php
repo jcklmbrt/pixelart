@@ -7,13 +7,18 @@ use ctrl\request;
 use ctrl\session;
 use mdl\comment;
 use mdl\picture;
-use mdl\user;
 
 $s = new session;
+
+const MAX_COMMENT = 256;
 
 if(request::posted("msg", "pictureid")) {
 	$msg       = htmlentities($_POST['msg']);
 	$pictureid = intval($_POST['pictureid']);
+
+	if(strlen($msg) > MAX_COMMENT) {
+		$msg = substr($msg, 0, MAX_COMMENT);
+	}
 
 	$user    = $s->get_local_user();
 	$picture = picture::from_id($pictureid);

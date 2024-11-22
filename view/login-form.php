@@ -1,5 +1,5 @@
-<?php use ctrl\request; ?>
-<?php $err = request::get('login_error') ?> 
+<?php use ctrl\session; ?>
+<?php $s = new session; ?>
 
 <div class="form-container">
 	<div class="title">
@@ -10,8 +10,8 @@
 		<label>Username:</label><input type="text"     name="username"></input>
 		<label>Password:</label><input type="password" name="password"></input>
 		<input type="submit" value="Submit"></input>
-		<?php if(!is_null($err)) { ?>
-			<div class="error"> <?= $err; ?> </div>
+		<?php while($err = $s->err_pop()) { ?>
+			<div class="error"> &ast; <?= $err; ?> </div>
 		<?php } ?>
 	</form>
 </div>

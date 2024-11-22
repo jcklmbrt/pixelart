@@ -18,6 +18,7 @@ class picture
 		$this->id    = $id;
 		$this->user  = $user;
 		$this->title = $title;
+		$this->date  = $date;
 		$this->data  = $data;
 	}
 

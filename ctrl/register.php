@@ -16,37 +16,39 @@ const MIN_USERNAME = 3;
 const MIN_PASSWORD = 8;
 const MAX_PASSWORD = 24;
 
-function valid_username(string $username, &$error) : bool
+function valid_username(session $s, string $username) : bool
 {
 	$len = strlen($username);
+	$res = true;
 
 	if($len > MAX_USERNAME) {
-		$error = 'Username must be shorter than ' . MAX_USERNAME . ' chars';
-		return false;
+		$s->err_push('Username must be shorter than ' . MAX_USERNAME . ' chars');
+		$res = false;
 	}
 
 	if($len < MIN_USERNAME) {
-		$error = 'Username must be longer than ' . MIN_USERNAME . ' chars';
-		return false;
+		$s->err_push('Username must be longer than ' . MIN_USERNAME . ' chars');
+		$res = false;
 	}
 
 	if(!ctype_alnum($username)) {
-		$error = 'Username must be alphanumeric';
-		return false;
+		$s->err_push('Username must be alphanumeric');
+		$res = false;
 	}
 
 	/* user already exists */
 	if(!is_null(user::fetch($username))) {
-		$error = 'A user with that name already exists';
-		return false;
+		$s->err_push('A user with that name already exists');
+		$res = false;
 	}
 
-	return true;
+	return $res;
 }
 
-function valid_password(string $password, &$error) : bool
+function valid_password(session $s, string $password) : bool
 {
 	$len = strlen($password);
+	$res = true;
 
 	$onepunct = false;
 	$onelet   = false;
@@ -71,65 +73,59 @@ function valid_password(string $password, &$error) : bool
 	}
 
 	if($onepunct != true) {
-		$error = 'Password must include at least one punctuation mark';
-		return false;
+		$s->err_push('Password must include at least one punctuation mark');
+		$res = false;
 	}
 
 	if($onecap != true) {
-		$error = 'Password must include at least one captial letter';
-		return false;
+		$s->err_push('Password must include at least one captial letter');
+		$res = false;
 	}
 
 	if($onelet != true) {
-		$error = 'Password must include at least one number';
-		return false;
+		$s->err_push('Password must include at least one number');
+		$res = false;
 	}
 
 	if($len > MAX_PASSWORD) {
-		$error = 'Password must be shorter than ' . MAX_PASSWORD . ' chars';
-		return false;
+		$s->err_push('Password must be shorter than ' . MAX_PASSWORD . ' chars');
+		$res = false;
 	}
 
 	if($len < MIN_PASSWORD) {
-		$error = 'Password must be longer than ' . MIN_PASSWORD . ' chars';
-		return false;
+		$s->err_push('Password must be longer than ' . MIN_PASSWORD . ' chars');
+		$res = false;
 	}
 
-	return true;
+	return $res;
 }
 
-function set_error($msg) : void 
-{
-	request::push_get('page', 'register');
-	request::push_get('register_error', $msg);
-	request::relocate("/");
-	die;
-}
 
 if(request::posted("username", "password", "password2")) {
 	$username  = htmlentities($_POST['username']);
 	$password  = htmlentities($_POST['password']);
 	$password2 = htmlentities($_POST['password2']);
 
+	$valid = true;
+
 	if($password != $password2) {
-		set_error('Passwords do not match');
+		$s->err_push('Passwords do not match');
+		$valid = false;
 	}
 
-	if(!valid_username($username, $error)) {
-		set_error($error);
+	$valid &= valid_username($s, $username);
+	$valid &= valid_password($s, $password);
+
+	if($valid) {
+		$user = user::insert($username, $password);
+
+		if(is_null($user)) {
+			$s->err_push('Database error. Try again later');
+		} else {
+			$s->set_local_user($user);
+			$s->set_page('home');
+		}
 	}
-
-	if(!valid_password($password, $error)) {
-		set_error($error);
-	}
-
-	$user = user::insert($username, $password);
-
-	if(is_null($user)) {
-		set_error('Database error. Try again later');
-	}
-
-	$s->set_local_user($user);
 }
 
 request::relocate("/");
